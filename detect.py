@@ -6,6 +6,7 @@ from train_v2 import normalize,l2_normalizer
 from scipy.spatial.distance import cosine
 from tensorflow.keras.models import load_model
 import pickle
+import faiss
 
 
 confidence_t=0.99
@@ -58,7 +59,12 @@ def detect(img ,detector,encoder,encoding_dict):
                         (0, 200, 200), 2)
     return img 
 
-
+def build_faiss_index(encoding_dict):
+    names = list(encoding_dict.keys())
+    embeddings = np.array(list(encoding_dict.values())).astype('float32')
+    index = faiss.IndexFlatL2(embeddings.shape[1])  # L2 distance
+    index.add(embeddings)
+    return index, names
 
 if __name__ == "__main__":
     required_shape = (160,160)
